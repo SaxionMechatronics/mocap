@@ -95,7 +95,7 @@ There are three main components of this software:
 
 We depend on an accurate update rate from VICON. Make sure the **Genlock and Timecode** settings match with the following image. These settings correspond with `ViconSDK::TimecodeStandard::PAL`.
 
-![tracker2.2_timecode_settings](.gitlab/timecode_settings.png)
+![tracker2.2_timecode_settings](media/timecode_settings.png)
 
 ### OptiTrack Motive
 
@@ -112,14 +112,14 @@ For more details, see the following links to the wiki:
 - Min Marker Count 6 or 8 (depending on how many markers you use)
 - Max Deflection: 8mm
 - Tracking Algorithm: Ray Based 
-<img src=".gitlab/optitrack_rigid_body_settings.jpg" alt="drawing" width="200"/>  
+<img src="media/optitrack_rigid_body_settings.jpg" alt="drawing" width="200"/>  
 
 
 2. Change these camera parameters
 - Max Residual: 6.00
 - Maximum Ray Length: 12.00
 
-<img src=".gitlab/optitrack_camera_settings.jpg" alt="drawing" width="200"/>  
+<img src="media/optitrack_camera_settings.jpg" alt="drawing" width="200"/>  
 
 
 
