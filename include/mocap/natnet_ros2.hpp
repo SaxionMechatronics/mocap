@@ -28,12 +28,6 @@ public:
   void process_rigid_body(sRigidBodyData& data);
 
 private:
-  // Helpers
-  void setup_parameters_();
-  void setup_publishers_();
-  void setup_tf_();
-  void maybe_connect_();   // optional: connect on startup if desired
-
   // NatNet internals
   NatNetClient* g_pClient{nullptr};
   sNatNetClientConnectParams g_connectParams{};
