@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <chrono>
 #include <string>
 
 #include <rclcpp/rclcpp.hpp>
@@ -19,14 +18,12 @@ public:
   // Connection / config
   bool disconnect();
   bool connect();
-  void set_conn_params();
 
   // NatNet related
   void process_frame(sFrameOfMocapData* data);
 
   void get_info();
   void del_info();
-  std::chrono::nanoseconds get_latency_info(sFrameOfMocapData* data);
 
   void process_rigid_body(sRigidBodyData& data);
 
@@ -54,9 +51,6 @@ private:
   // ROS publishers
   std::map<int32_t, std::string> ListRigidBodies;
   std::map<std::string, rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr> RigidbodyPub;
-
-  // Optional: keep a simple “connected” state
-  bool connected_{false};
 };
 
 void NATNET_CALLCONV frame_callback(sFrameOfMocapData* data, void* pUserData);

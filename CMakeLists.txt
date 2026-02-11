@@ -12,19 +12,19 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
-set(NATNET_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetAMD64/) 
-set(NATNET_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetAMD64/lib/libNatNet.so)
-
-set(my_include_directories
-  include
-  ${CMAKE_CURRENT_BINARY_DIR}/include
-  ${NATNET_SDK_DIR}/include
-)
+# Select NatNet SDK directory based on target architecture.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  set(NATNET_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetARM64/)
+  set(NATNET_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetARM64/lib/libNatNet.so)
+else()
+  set(NATNET_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetAMD64/)
+  set(NATNET_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/NatNetAMD64/lib/libNatNet.so)
+endif()
 
 include_directories(
   include
-  ${my_include_directories}
-)
+  ${CMAKE_CURRENT_BINARY_DIR}/include
+  ${NATNET_SDK_DIR}/include)
 
 add_executable(natnet_ros2_node
   src/natnet_ros2.cpp 

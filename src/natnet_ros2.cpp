@@ -8,8 +8,8 @@ NatNetNode::NatNetNode(const rclcpp::NodeOptions& node_options)
   : rclcpp::Node("natnet_ros2_node", node_options)
 {
   // Basic connection + frame parameters (keep this minimal)
-  serverIP          = this->declare_parameter<std::string>("serverIP", "192.168.0.100");
-  clientIP          = this->declare_parameter<std::string>("clientIP", "192.168.0.101");
+  serverIP          = this->declare_parameter<std::string>("serverIP", "192.168.1.245");
+  clientIP          = this->declare_parameter<std::string>("clientIP", "192.168.1.136");
   serverType        = this->declare_parameter<std::string>("serverType", "multicast");
   multicastAddress  = this->declare_parameter<std::string>("multicastAddress", "239.255.42.99");
   serverCommandPort = this->declare_parameter<int>("serverCommandPort", 1510);
@@ -29,33 +29,16 @@ NatNetNode::NatNetNode(const rclcpp::NodeOptions& node_options)
 
   // Start streaming: frames will be forwarded to process_frame().
   g_pClient->SetFrameReceivedCallback(frame_callback, this);
-  connected_ = true;
 }
 
 NatNetNode::~NatNetNode()
 {
   if (g_pClient != nullptr) {
+    del_info();
     g_pClient->Disconnect();
     delete g_pClient;
     g_pClient = nullptr;
   }
-}
-
-void NatNetNode::set_conn_params()
-{
-  // Configure the NatNet connection parameters from the current members.
-  g_ConnectionType = (serverType == "unicast") ?
-                      ConnectionType_Unicast :
-                      ConnectionType_Multicast;
-
-  std::memset(&g_connectParams, 0, sizeof(g_connectParams));
-  g_connectParams.connectionType   = g_ConnectionType;
-  g_connectParams.serverCommandPort = serverCommandPort;
-  g_connectParams.serverDataPort    = serverDataPort;
-  g_connectParams.serverAddress     = serverIP.c_str();
-  g_connectParams.localAddress      = clientIP.c_str();
-  g_connectParams.multicastAddress  =
-    (serverType == "multicast") ? multicastAddress.c_str() : nullptr;
 }
 
 bool NatNetNode::connect()
@@ -66,7 +49,15 @@ bool NatNetNode::connect()
   }
 
   // Apply parameters into the NatNet client connect struct.
-  set_conn_params();
+  g_ConnectionType = (serverType == "unicast") ? ConnectionType_Unicast : ConnectionType_Multicast;
+  std::memset(&g_connectParams, 0, sizeof(g_connectParams));
+  g_connectParams.connectionType    = g_ConnectionType;
+  g_connectParams.serverCommandPort = serverCommandPort;
+  g_connectParams.serverDataPort    = serverDataPort;
+  g_connectParams.serverAddress     = serverIP.c_str();
+  g_connectParams.localAddress      = clientIP.c_str();
+  g_connectParams.multicastAddress  = (serverType == "multicast") ? multicastAddress.c_str() : nullptr;
+
 
   RCLCPP_INFO(get_logger(),
               "Connecting to NatNet server at %s (type=%s, local=%s, dataPort=%d, cmdPort=%d)...",
@@ -101,7 +92,6 @@ bool NatNetNode::disconnect()
   }
 
   g_pClient->Disconnect();
-  connected_ = false;
   return true;
 }
 
@@ -156,13 +146,6 @@ void NatNetNode::del_info()
 // ----------------------------------------------------------------------------
 // Frame processing
 // ----------------------------------------------------------------------------
-
-std::chrono::nanoseconds NatNetNode::get_latency_info(sFrameOfMocapData* /*data*/)
-{
-  // In the simplified node we do not compensate for system latency.
-  // Always return zero.
-  return std::chrono::nanoseconds::zero();
-}
 
 void NatNetNode::process_frame(sFrameOfMocapData* data)
 {
